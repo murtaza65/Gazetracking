@@ -26,6 +26,17 @@ output:
 
 
 
+Backend: 
+must! follow the files structure its bettr to download rom the link. 
+this part detect the eye gaxze and give out puts 
+![image](https://github.com/user-attachments/assets/ccd365b6-dd15-416c-9d1f-3a01aabfc35d)
+![image](https://github.com/user-attachments/assets/83aac5e3-9845-4177-ac81-edab65e70fb5)
+
+
+
+
+
+
 Eye Gaze & Stress Detection Dashboard
 Technologies Used
 
