@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Eye Gaze Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="dashboard-container">
+
+    <!-- Header -->
+    <div class="header">
+      <h2>Gaze and Stress Detection Dashboard</h2>
+      <div class="user-info">
+        <span>Welcome, user!</span>
+        <a href="{{ url_for('history') }}">View History</a>
+      </div>
+    </div>
+
+    <!-- Metrics Section -->
+    <div class="metrics">
+      <div class="metric-box">
+        <p>Stress Level</p>
+        <h3 id="live-stress">N/A</h3>
+      </div>
+      <div class="metric-box">
+        <p>Blink Count</p>
+        <h3 id="live-blink">N/A</h3>
+      </div>
+      <div class="metric-box">
+        <p>Gaze Direction</p>
+        <h3 id="live-gaze">N/A</h3>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="btn start" onclick="startDetection()">Start Tracking</button>
+      <button class="btn show" onclick="showResults()">Show Graphs</button>
+      <button class="btn reset" onclick="resetDetection()">Reset Detection</button>
+      <p>Status: <span id="status" class="stopped">Stopped</span></p>
+    </div>
+
+    <!-- Graphs Section -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <canvas id="blinkChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <canvas id="gazeChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <canvas id="stressChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function startDetection() {
+      document.getElementById("status").textContent = "Running...";
+      document.getElementById("status").className = "running";
+
+      fetch('/start').then(res => res.json()).then(() => {
+        alert("Detection started. Wait 30s before showing graphs.");
+      });
+    }
+
+    function showResults() {
+      fetch('/results')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("live-blink").innerText = data.blinks;
+          document.getElementById("live-gaze").innerText = data.gaze[data.gaze.length - 1];
+          document.getElementById("live-stress").innerText = data.stress[data.stress.length - 1];
+
+          drawCharts(data);
+        });
+    }
+
+    function drawCharts(data) {
+      const time = data.timestamps;
+      const blinks = Array(time.length).fill(data.blinks);
+      const gaze = data.gaze.map(dir => ({ left: -1, center: 0, right: 1 }[dir]));
+      const stress = data.stress;
+
+      new Chart(document.getElementById("blinkChart"), {
+        type: 'line',
+        data: {
+          labels: time,
+          datasets: [{
+            label: 'Blink Count',
+            data: blinks,
+            borderColor: '#007bff',
+            borderWidth: 2,
+            tension: 0.3
+          }]
+        }
+      });
+
+      new Chart(document.getElementById("gazeChart"), {
+        type: 'line',
+        data: {
+          labels: time,
+          datasets: [{
+            label: 'Gaze Direction',
+            data: gaze,
+            borderColor: '#28a745',
+            borderWidth: 2,
+            tension: 0.3
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              min: -1,
+              max: 1,
+              ticks: {
+                callback: val => ['Left', 'Center', 'Right'][val + 1]
+              }
+            }
+          }
+        }
+      });
+
+      new Chart(document.getElementById("stressChart"), {
+        type: 'line',
+        data: {
+          labels: time,
+          datasets: [{
+            label: 'Stress Level',
+            data: stress,
+            borderColor: '#dc3545',
+            borderWidth: 2,
+            tension: 0.3
+          }]
+        }
+      });
+    }
+    function resetDetection() {
+  fetch('/reset')
+    .then(res => res.json())
+    .then(data => {
+      alert("Detection has been reset!");
+      location.reload(); // Optional: reload the page to clear charts
+    });
+}
+
+  </script>
+</body>
+</html>

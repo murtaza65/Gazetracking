@@ -1,0 +1,145 @@
+/* style.css - Dashboard Styling */
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f7fa;
+  color: #333;
+}
+
+.dashboard-container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 30px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.header h2 {
+  color: #007bff;
+  margin: 0;
+}
+
+.user-info span {
+  font-weight: 500;
+}
+
+.user-info a {
+  color: #007bff;
+  text-decoration: none;
+  margin-left: 15px;
+  font-size: 14px;
+}
+
+.logout-btn {
+  background-color: #dc3545;
+  border: none;
+  color: #fff;
+  padding: 5px 10px;
+  margin-left: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.metric-box {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.metric-box p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.metric-box h3 {
+  font-size: 20px;
+  color: #111;
+  margin-top: 5px;
+}
+
+.controls {
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn.start {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn.show {
+  background-color: #28a745;
+  color: white;
+}
+.btn.reset {
+  background-color: #ffc107;
+  color: black;
+  margin-left: 10px;
+}
+
+
+#status {
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+#status.stopped {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+#status.running {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.chart-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+}
+
+canvas {
+  width: 100% !important;
+  height: auto !important;
+}

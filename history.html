@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>History - Merged Chart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="dashboard-container">
+    <div class="header">
+      <h2> Gaze and Stress History Overview</h2>
+      <a href="/" class="back-btn">⬅Back to Dashboard</a>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card" style="width: 100%;">
+        <canvas id="mergedChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Toggle Controls -->
+    <div style="text-align: center; margin-top: 1rem;">
+      <label><input type="checkbox" id="toggleBlink" checked> Show Blink</label>
+      <label><input type="checkbox" id="toggleGaze" checked> Show Gaze</label>
+      <label><input type="checkbox" id="toggleStress" checked> Show Stress</label>
+    </div>
+  </div>
+
+  <script>
+    let mergedChart;
+
+    function renderChart(data, showBlink, showGaze, showStress) {
+      const time = data.timestamps || [];
+      const blinkData = Array(time.length).fill(data.blinks || 0);
+      const gazeData = (data.gaze || []).map(dir => ({ left: -1, center: 0, right: 1 }[dir]));
+      const stressData = data.stress || [];
+
+      const datasets = [];
+
+      if (showBlink) {
+        datasets.push({
+          label: 'Blink Count',
+          data: blinkData,
+          borderColor: '#007bff',
+          borderWidth: 2,
+          tension: 0,
+          pointRadius: 0
+        });
+      }
+      if (showGaze) {
+        datasets.push({
+          label: 'Gaze Direction',
+          data: gazeData,
+          borderColor: '#28a745',
+          borderWidth: 2,
+          tension: 0,
+          pointRadius: 0
+        });
+      }
+      if (showStress) {
+        datasets.push({
+          label: 'Stress Level',
+          data: stressData,
+          borderColor: '#dc3545',
+          borderWidth: 2,
+          tension: 0,
+          pointRadius: 0
+        });
+      }
+
+      if (mergedChart) mergedChart.destroy();
+
+      mergedChart = new Chart(document.getElementById("mergedChart"), {
+        type: 'line',
+        data: {
+          labels: time,
+          datasets: datasets
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'top' },
+            title: {
+              display: true,
+              text: 'Merged Metrics Over Time'
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Time (s)'
+              },
+              ticks: {
+                autoSkip: true,
+                maxTicksLimit: 20
+              }
+            },
+            y: {
+              min: -2,
+              max: 20,
+       
+              title: {
+                display: true,
+                text: 'Metric Value'
+              },
+              ticks: {
+                stepSize: 1,
+                callback: function (val) {
+                  if (val === -1) return "Left";
+                  if (val === 0) return "Center";
+                  if (val === 1) return "Right";
+                  return val;
+                }
+              }
+            }
+          },
+          layout: {
+            padding: 10
+          }
+        }
+      });
+    }
+
+    fetch('/results')
+      .then(res => res.json())
+      .then(data => {
+        renderChart(data, true, true, true);
+
+        document.getElementById('toggleBlink').addEventListener('change', () => {
+          renderChart(data, document.getElementById('toggleBlink').checked,
+                           document.getElementById('toggleGaze').checked,
+                           document.getElementById('toggleStress').checked);
+        });
+
+        document.getElementById('toggleGaze').addEventListener('change', () => {
+          renderChart(data, document.getElementById('toggleBlink').checked,
+                           document.getElementById('toggleGaze').checked,
+                           document.getElementById('toggleStress').checked);
+        });
+
+        document.getElementById('toggleStress').addEventListener('change', () => {
+          renderChart(data, document.getElementById('toggleBlink').checked,
+                           document.getElementById('toggleGaze').checked,
+                           document.getElementById('toggleStress').checked);
+        });
+      });
+  </script>
+</body>
+</html>
